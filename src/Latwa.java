@@ -23,6 +23,8 @@ class Model{
 
 
 class Latwa extends JFrame {
+    public ArrayList<Integer> x = new ArrayList<>();
+    public ArrayList<Integer> y = new ArrayList<>();
     Random r = new Random();
     Model model = new Model();
     JTextField tab[][] = new JTextField[5][5] ;
@@ -32,7 +34,8 @@ class Latwa extends JFrame {
     JButton zapis = new JButton("Zapisz"),
             wczytaj = new JButton("Wczytaj"),
             menu = new JButton("Menu"),
-            instrukcja = new JButton("Instrukcja");
+            instrukcja = new JButton("Instrukcja"),
+            cofnij = new JButton("Cofnij");
     JPanel plansza = new JPanel();
     JPanel sterowanie = new JPanel();
     public Latwa() throws FileNotFoundException {
@@ -47,6 +50,7 @@ class Latwa extends JFrame {
         sterowanie.add(imie);
         sterowanie.add(zapis);
         sterowanie.add(wczytaj);
+        sterowanie.add(cofnij);
         sterowanie.add(instrukcja);
         sterowanie.add(menu);
         checkButton.addActionListener(new CheckButton());
@@ -54,8 +58,9 @@ class Latwa extends JFrame {
         wczytaj.addActionListener(new WczytajButton());
         menu.addActionListener(new MenuButton());
         instrukcja.addActionListener(new InstrukcjaButton());
+        cofnij.addActionListener(new CofnijButton());
         checkButton.setEnabled(false);
-        sterowanie.setLayout(new GridLayout(7,1));
+        sterowanie.setLayout(new GridLayout(8,1));
         plansza.setLayout(new GridLayout(5,5));
         for (i=0;i<5;i++)
             for (j=0;j<5;j++){
@@ -417,10 +422,18 @@ class Latwa extends JFrame {
             this.i = i;
             this.j = j;
         }
+
+
+
         @Override
         public void insertUpdate(DocumentEvent e)  {
 
             puste();
+            if(tab[i][j].isEditable()) {
+                x.add(i);
+                y.add(j);
+            }
+
 
         }
 
@@ -513,6 +526,23 @@ class Latwa extends JFrame {
             JFrame f = new Main();
             f.setSize(300 , 100);
             f.setVisible(true);
+        }
+    }
+
+    class CofnijButton implements ActionListener{
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(x.size()>0){
+                int i = x.get(x.size() - 1 );
+                int j = y.get(y.size() - 1 );
+                if(tab[i][j].isEditable()) {
+                    tab[i][j].setText("");
+                    x.remove(x.size() - 1);
+                    y.remove(y.size() - 1);
+                }
+            }
+
         }
     }
 
