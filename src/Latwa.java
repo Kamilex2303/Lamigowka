@@ -1,9 +1,17 @@
-
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Scanner;
+
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -19,13 +27,15 @@ class Latwa extends JFrame {
     Model model = new Model();
     JTextField tab[][] = new JTextField[5][5] ;
     JTextField t = new JTextField(10);
+    JTextField imie = new JTextField();
     JButton checkButton = new JButton("Check");
     JButton zapis = new JButton("Zapisz"),
             wczytaj = new JButton("Wczytaj"),
-            menu = new JButton("Menu");
+            menu = new JButton("Menu"),
+            instrukcja = new JButton("Instrukcja");
     JPanel plansza = new JPanel();
     JPanel sterowanie = new JPanel();
-    public Latwa() {
+    public Latwa() throws FileNotFoundException {
         int i,j;
         Container cp = getContentPane();
         cp.setLayout(new GridLayout(1,2));
@@ -34,15 +44,18 @@ class Latwa extends JFrame {
         t.setEditable(false);
         t.setHorizontalAlignment(SwingConstants.CENTER);
         sterowanie.add(checkButton);
+        sterowanie.add(imie);
         sterowanie.add(zapis);
         sterowanie.add(wczytaj);
+        sterowanie.add(instrukcja);
         sterowanie.add(menu);
         checkButton.addActionListener(new CheckButton());
-        zapis.addActionListener(new ZapisButton());
+        zapis.addActionListener(new ZapiszButton());
         wczytaj.addActionListener(new WczytajButton());
         menu.addActionListener(new MenuButton());
+        instrukcja.addActionListener(new InstrukcjaButton());
         checkButton.setEnabled(false);
-        sterowanie.setLayout(new GridLayout(5,1));
+        sterowanie.setLayout(new GridLayout(7,1));
         plansza.setLayout(new GridLayout(5,5));
         for (i=0;i<5;i++)
             for (j=0;j<5;j++){
@@ -52,34 +65,43 @@ class Latwa extends JFrame {
                 plansza.add(tab[i][j]);
                 tab[i][j].getDocument().addDocumentListener(new B(i ,j));
             }
-        tab[3][0].setBackground(Color.black);
-        tab[3][0].setText("999");
-        tab[3][0].setEditable(false);
-
-        tab[0][4].setText("5");
-        tab[0][4].setEditable(false);
-
-
-        tab[1][0].setText("3");
-        tab[1][0].setEditable(false);
-
-        tab[1][2].setText("1");
-        tab[1][2].setEditable(false);
-
-        tab[2][1].setBackground(Color.black);
-        tab[2][1].setText("1001");
-        tab[2][1].setEditable(false);
-
-        tab[4][3].setBackground(Color.black);
-        tab[4][3].setText("1002");
-        tab[4][3].setEditable(false);
-
+    
+        wczytaj();
+        
         cp.setSize(1200 , 600);
         cp.setVisible(true);
 
 
         middle();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+    }
+    
+    void wczytaj() throws FileNotFoundException{
+    	int n = r.nextInt(4)+1;
+    	File file = new File("mapa"+n+".txt");
+    	Scanner read = new Scanner(file);
+    	
+    	for(int i=0 ; i<5 ; i++){
+    		for(int j=0 ; j<5 ; j++){
+    			String znak = read.next();
+    			if(znak.equals("-")){
+    				
+    			}
+    			else if(Integer.parseInt(znak) >= 1000){
+    				tab[i][j].setBackground(Color.black);
+    				tab[i][j].setEditable(false);
+    				tab[i][j].setText(znak);
+    			}
+    			else{
+    				tab[i][j].setText(znak);
+    				tab[i][j].setEditable(false);
+    			}
+    		}
+    	}
+    	
+    	
+    	
+    	
     }
 
     void middle(){
@@ -424,20 +446,61 @@ class Latwa extends JFrame {
     }
 
 
-    class ZapisButton implements ActionListener{
+    class ZapiszButton implements ActionListener {
+
+ 		public void actionPerformed(ActionEvent e) {
+ 			try {
+ 				FileOutputStream fos = new FileOutputStream(imie.getText());
+ 				ObjectOutputStream oos = new ObjectOutputStream(fos);
+ 		
+ 				for (int i = 0; i < 5; i++) {
+ 					for (int j = 0; j < 5; j++) {
+ 						oos.writeObject(tab[i][j].getText());
+ 					}
+ 				}
+ 				fos.close();
+ 			} catch (IOException e1) {
+ 				// TODO Auto-generated catch block
+ 				e1.printStackTrace();
+ 			}
+ 		}
+ 	}
+
+ 	// klasa wczytuj�ca stan gry z pliku
+ 	class WczytajButton implements ActionListener {
+
+ 		public void actionPerformed(ActionEvent e) {
+ 			try {
+ 				FileInputStream fis = new FileInputStream(imie.getText());
+ 				ObjectInputStream ois = new ObjectInputStream(fis);
+ 				for (int i = 0; i < 5; i++) {
+ 					for (int j = 0; j < 5; j++) {
+ 						tab[i][j].setText((String)ois.readObject());
+ 					}
+ 				}
+ 				ois.close();
+ 			} catch (IOException | ClassNotFoundException e1) {
+ 				// TODO Auto-generated catch block
+ 				e1.printStackTrace();
+ 			}
+
+ 		}
+ 	}
+    
+    class InstrukcjaButton implements ActionListener{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
-
-        }
-    }
-
-    class WczytajButton implements ActionListener{
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-
+        	JFrame f = new JFrame();
+        	f.setSize(400, 400);
+        	Container cont = f.getContentPane();
+        	JLabel tekst = new JLabel();
+        	cont.setLayout(new GridLayout(1,2));
+        	cont.add(tekst);
+        	tekst.setText("<html>Kilka pól prostokąta zaczerniono, a w niektóre wpisano liczby. <br> Zadanie polega na wypełnieniu liczbami wszystkich pustych pól tak, aby spełnione były następujące warunki:<br>w każdym rzędzie i w każdej kolumnie kwadratu powinny znaleźć się różne liczby;<br>wszystkie liczby w każdym rzędzie (kolumnie) powinny być kolejnymi w ciągu liczb naturalnych;<br> inaczej mówiąc, po ustawieniu ich od najmniejszej do największej różnica między każdymi <br>dwiema kolejnymi liczbami powinna być równa jeden.</html>");
+        	f.setVisible(true);
+        	
+        	
 
         }
     }

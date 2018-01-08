@@ -1,6 +1,10 @@
-
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -15,10 +19,12 @@ class Trudna extends JFrame {
     Random r = new Random();
     JTextField tab[][] = new JTextField[9][9] ;
     JTextField t = new JTextField(10);
+    JTextField imie = new JTextField();
     JButton checkButton = new JButton("Check");
     JButton zapis = new JButton("Zapisz"),
     wczytaj = new JButton("Wczytaj"),
-    menu = new JButton("Menu");
+    menu = new JButton("Menu"),
+    instrukcja = new JButton("Instrukcja");
     JPanel plansza = new JPanel();
     JPanel sterowanie = new JPanel();
     public Trudna() {
@@ -30,14 +36,17 @@ class Trudna extends JFrame {
         t.setEditable(false);
         t.setHorizontalAlignment(SwingConstants.CENTER);
         sterowanie.add(checkButton);
+        sterowanie.add(imie);
         sterowanie.add(zapis);
         sterowanie.add(wczytaj);
+        sterowanie.add(instrukcja);
         sterowanie.add(menu);
         checkButton.addActionListener(new CheckButton());
         checkButton.setEnabled(false);
-        zapis.addActionListener(new ZapisButton());
+        zapis.addActionListener(new ZapiszButton());
         wczytaj.addActionListener(new WczytajButton());
         menu.addActionListener(new MenuButton());
+        instrukcja.addActionListener(new InstrukcjaButton());
         sterowanie.setLayout(new GridLayout(9,1));
         plansza.setLayout(new GridLayout(9,9));
         for (i=0;i<9;i++)
@@ -753,23 +762,63 @@ class Trudna extends JFrame {
         }
     }
 
-    class ZapisButton implements ActionListener{
+    class ZapiszButton implements ActionListener {
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e) {
+			try {
+				FileOutputStream fos = new FileOutputStream(imie.getText());
+				ObjectOutputStream oos = new ObjectOutputStream(fos);
+		
+				for (int i = 0; i < 9; i++) {
+					for (int j = 0; j < 9; j++) {
+						oos.writeObject(tab[i][j].getText());
+					}
+				}
+				fos.close();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+	}
 
+	// klasa wczytuj�ca stan gry z pliku
+	class WczytajButton implements ActionListener {
 
-        }
-    }
+		public void actionPerformed(ActionEvent e) {
+			try {
+				FileInputStream fis = new FileInputStream(imie.getText());
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				for (int i = 0; i < 9; i++) {
+					for (int j = 0; j < 9; j++) {
+						tab[i][j].setText((String) ois.readObject());
+					}
+				}
+				ois.close();
+			} catch (IOException | ClassNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
-    class WczytajButton implements ActionListener{
+		}
+	}
+	
+	  class InstrukcjaButton implements ActionListener{
 
-        @Override
-        public void actionPerformed(ActionEvent e) {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	        	JFrame f = new JFrame();
+	        	f.setSize(400, 400);
+	        	Container cont = f.getContentPane();
+	        	JLabel tekst = new JLabel();
+	        	cont.setLayout(new GridLayout(1,2));
+	        	cont.add(tekst);
+	        	tekst.setText("<html>Kilka pól prostokąta zaczerniono, a w niektóre wpisano liczby. <br> Zadanie polega na wypełnieniu liczbami wszystkich pustych pól tak, aby spełnione były następujące warunki:<br>w każdym rzędzie i w każdej kolumnie kwadratu powinny znaleźć się różne liczby;<br>wszystkie liczby w każdym rzędzie (kolumnie) powinny być kolejnymi w ciągu liczb naturalnych;<br> inaczej mówiąc, po ustawieniu ich od najmniejszej do największej różnica między każdymi <br>dwiema kolejnymi liczbami powinna być równa jeden.</html>");
+	        	f.setVisible(true);
+	        	
+	        }
+	    }
 
-
-        }
-    }
     class MenuButton implements ActionListener{
 
         @Override

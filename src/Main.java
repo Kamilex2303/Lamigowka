@@ -1,6 +1,6 @@
-
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
@@ -30,9 +30,16 @@ public class Main extends JFrame {
         public void actionPerformed(ActionEvent e) {
 
             setVisible(false);
-            JFrame l = new Latwa();
-            l.setSize(1200 , 600);
-            l.setVisible(true);
+            JFrame l;
+			try {
+				l = new Latwa();
+				 l.setSize(1200 , 600);
+		            l.setVisible(true);
+			} catch (FileNotFoundException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+           
 
 
 
