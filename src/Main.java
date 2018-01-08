@@ -1,85 +1,61 @@
+
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-class Model{
-    char  tab[][] = new char[9][9];
+public class Main extends JFrame {
 
-}
-
-
-class Main extends JFrame {
-    Random r = new Random();
-    Model model = new Model();
-    JTextField tab[][] = new JTextField[9][9] ;
-    JTextField t = new JTextField(10);
-    JPanel plansza = new JPanel();
-    JPanel sterowanie = new JPanel();
     public Main() {
-        int i,j;
         Container cp = getContentPane();
-        cp.setLayout(new GridLayout(1,2));
-        cp.add(plansza);cp.add(sterowanie);
-        sterowanie.add(t);
-        t.setHorizontalAlignment(SwingConstants.CENTER);
+        cp.setLayout(new GridLayout(1, 2));
+        cp.setSize(100, 100);
+        JButton latweButton = new JButton("Latwa");
+        JButton trudnaButton = new JButton("Trudna");
+        cp.add(latweButton);
+        cp.add(trudnaButton);
 
-        sterowanie.setLayout(new GridLayout(9,1));
-        plansza.setLayout(new GridLayout(9,9));
-        for (i=0;i<9;i++)
-            for (j=0;j<9;j++){
-                tab[i][j]=new JTextField("");
-                tab[i][j].setBackground(Color.LIGHT_GRAY);
-                plansza.add(tab[i][j]);
-                tab[i][j].getDocument().addDocumentListener(new B(i ,j));
-            }
-
-        middle();
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        latweButton.addActionListener(new LatwaButton());
+        trudnaButton.addActionListener(new TrudnaButton());
     }
 
-    void middle(){
-        for(int i=0 ; i<9 ; i++){
-            for(int j=0 ; j<9 ; j++){
-                tab[i][j].setHorizontalAlignment(SwingConstants.CENTER);
-            }
+
+    class LatwaButton implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            setVisible(false);
+            JFrame l = new Latwa();
+            l.setSize(1200 , 600);
+            l.setVisible(true);
+
+
+
         }
     }
 
-    class B implements DocumentListener {
-
-        int i;
-        int j;
-
-        B(int i , int j){
-            this.i = i;
-            this.j = j;
-        }
-        @Override
-        public void insertUpdate(DocumentEvent e)  {
-
-            t.setText(i + " , "+j);
-
-        }
+    class TrudnaButton implements ActionListener {
 
         @Override
-        public void removeUpdate(DocumentEvent e) {
+        public void actionPerformed(ActionEvent e) {
+
+            setVisible(false);
+            JFrame f = new Trudna();
+            f.setSize(1200,600);
+            f.setVisible(true);
 
         }
-
-        @Override
-        public void changedUpdate(DocumentEvent e) {
-
-        }
-
     }
 
     public static void main(String[] args) {
-        JFrame f = new Main();
-        f.setSize(1200,600);
-        f.setLocation(500,300);
-        f.setVisible(true);
+            JFrame f = new Main();
+            f.setSize(300, 100);
+            f.setVisible(true);
     }
+
 }
